@@ -26,3 +26,14 @@ jobs:
       - run: docker run -d --name biblioteca-ci -p 8080:8080 biblioteca-ci:latest
       - run: sleep 10
       - run: curl -fsS http://localhost:8080/saude; then exit 0
+  publicar:
+    needs: imagem
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t "$IMAGEM:latest" -t "$IMAGEM:${GITHUB_SHA}" .
+      - run: docker login ghcr.io -u "${{github.actor}}" --password stdin
+      - run: docker push "$IMAGEM:latest"
