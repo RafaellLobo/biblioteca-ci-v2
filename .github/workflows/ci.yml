@@ -17,3 +17,12 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: pytest -v
       - run: ruff check .
+  image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t biblioteca-ci:latest
+      - run: docker run -d -name biblioteca-ci -p 8080:8080 biblioteca-ci:latest
+      - run: sleep 10
+      - run: curl -fsS http://localhost:8080/saude; then exit 0
